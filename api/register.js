@@ -34,8 +34,9 @@ export async function handleStudentRegistration(body, env = process.env) {
     return { status: 400, body: { error: 'Password must be at least 8 characters long.' } };
   }
 
-  const supabaseUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL;
-  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+  const rawUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || '';
+  const supabaseUrl = rawUrl.trim().replace(/\/rest\/v1\/?$/i, '').replace(/\/auth\/v1\/?$/i, '').replace(/\/+$/, '');
+  const serviceKey = (env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
   if (!supabaseUrl || !serviceKey) {
     return { status: 500, body: { error: 'Server authentication configuration is missing.' } };

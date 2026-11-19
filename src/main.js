@@ -2,8 +2,9 @@ import { createClient } from '@supabase/supabase-js';
 import QRCode from 'qrcode';
 import { Html5Qrcode } from 'html5-qrcode';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const rawSupabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
+const SUPABASE_URL = rawSupabaseUrl.replace(/\/rest\/v1\/?$/i, '').replace(/\/auth\/v1\/?$/i, '').replace(/\/+$/, '');
+const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
 const ADMIN_EMAILS = ['admin577528@gmail.com', 'harshritesh6360@gmail.com'];
 const configured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;

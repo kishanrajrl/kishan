@@ -273,8 +273,9 @@ export async function processAutomatedCancellations(supabase, actor = 'System Au
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const rawUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+  const SUPABASE_URL = rawUrl.trim().replace(/\/rest\/v1\/?$/i, '').replace(/\/auth\/v1\/?$/i, '').replace(/\/+$/, '');
+  const SUPABASE_SERVICE_ROLE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     return res.status(500).json({ error: 'Server database credentials not configured.' });
