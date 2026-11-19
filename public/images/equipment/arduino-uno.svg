@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <defs>
+    <linearGradient id="pcb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00878F"/>
+      <stop offset="100%" stop-color="#005F66"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0e0e0"/>
+      <stop offset="50%" stop-color="#b0b0b0"/>
+      <stop offset="100%" stop-color="#909090"/>
+    </linearGradient>
+    <filter id="sh" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  <rect width="100%" height="100%" fill="#F4F7F6" rx="12"/>
+  <g filter="url(#sh)">
+    <path d="M 40 30 L 260 30 C 265 30 270 35 270 40 L 270 160 C 270 165 265 170 260 170 L 40 170 C 35 170 30 165 30 160 L 30 40 C 30 35 35 30 40 30 Z" fill="url(#pcb)"/>
+  </g>
+  <circle cx="42" cy="42" r="5" fill="#d9e2e0" stroke="#a0b2af" stroke-width="2"/>
+  <circle cx="258" cy="42" r="5" fill="#d9e2e0" stroke="#a0b2af" stroke-width="2"/>
+  <circle cx="258" cy="158" r="5" fill="#d9e2e0" stroke="#a0b2af" stroke-width="2"/>
+  <rect x="18" y="45" width="32" height="40" rx="3" fill="url(#metal)" stroke="#666" stroke-width="1"/>
+  <rect x="20" y="53" width="10" height="24" fill="#333"/>
+  <rect x="16" y="115" width="36" height="38" rx="2" fill="#222"/>
+  <circle cx="20" cy="134" r="6" fill="#111" stroke="#555" stroke-width="2"/>
+  <rect x="62" y="38" width="14" height="14" rx="2" fill="#d32f2f" stroke="#333" stroke-width="1"/>
+  <circle cx="69" cy="45" r="4" fill="#f44336"/>
+  <rect x="110" y="110" width="100" height="30" rx="2" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+  <circle cx="118" cy="125" r="3" fill="#333"/>
+  <text x="130" y="129" font-family="monospace" font-size="8" fill="#bbb" font-weight="bold">ATMEGA328P</text>
+  <g fill="#aaa">
+    <rect x="114" y="106" width="3" height="4"/><rect x="122" y="106" width="3" height="4"/><rect x="130" y="106" width="3" height="4"/><rect x="138" y="106" width="3" height="4"/><rect x="146" y="106" width="3" height="4"/><rect x="154" y="106" width="3" height="4"/><rect x="162" y="106" width="3" height="4"/><rect x="170" y="106" width="3" height="4"/><rect x="178" y="106" width="3" height="4"/><rect x="186" y="106" width="3" height="4"/><rect x="194" y="106" width="3" height="4"/><rect x="202" y="106" width="3" height="4"/>
+    <rect x="114" y="140" width="3" height="4"/><rect x="122" y="140" width="3" height="4"/><rect x="130" y="140" width="3" height="4"/><rect x="138" y="140" width="3" height="4"/><rect x="146" y="140" width="3" height="4"/><rect x="154" y="140" width="3" height="4"/><rect x="162" y="140" width="3" height="4"/><rect x="170" y="140" width="3" height="4"/><rect x="178" y="140" width="3" height="4"/><rect x="186" y="140" width="3" height="4"/><rect x="194" y="140" width="3" height="4"/><rect x="202" y="140" width="3" height="4"/>
+  </g>
+  <rect x="85" y="72" width="20" height="10" rx="4" fill="url(#metal)"/>
+  <rect x="120" y="32" width="136" height="10" fill="#1e1e1e" rx="1"/>
+  <g fill="#e0e0e0">
+    <circle cx="126" cy="37" r="1.8"/><circle cx="134" cy="37" r="1.8"/><circle cx="142" cy="37" r="1.8"/><circle cx="150" cy="37" r="1.8"/><circle cx="158" cy="37" r="1.8"/><circle cx="166" cy="37" r="1.8"/><circle cx="174" cy="37" r="1.8"/><circle cx="182" cy="37" r="1.8"/><circle cx="194" cy="37" r="1.8"/><circle cx="202" cy="37" r="1.8"/><circle cx="210" cy="37" r="1.8"/><circle cx="218" cy="37" r="1.8"/><circle cx="226" cy="37" r="1.8"/><circle cx="234" cy="37" r="1.8"/><circle cx="242" cy="37" r="1.8"/><circle cx="250" cy="37" r="1.8"/>
+  </g>
+  <rect x="90" y="158" width="75" height="10" fill="#1e1e1e" rx="1"/>
+  <rect x="180" y="158" width="65" height="10" fill="#1e1e1e" rx="1"/>
+  <text x="130" y="75" font-family="sans-serif" font-size="14" fill="#fff" font-weight="bold" letter-spacing="1">ARDUINO</text>
+  <text x="130" y="92" font-family="sans-serif" font-size="12" fill="#fff" font-weight="bold">UNO</text>
+  <text x="170" y="92" font-family="sans-serif" font-size="9" fill="#cce">REV 3</text>
+</svg>

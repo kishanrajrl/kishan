@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <rect width="100%" height="100%" fill="#F4F7F6" rx="12"/>
+  <g filter="drop-shadow(0 4px 8px rgba(0,0,0,0.12))">
+    <rect x="25" y="45" width="270" height="110" rx="5" fill="#FAF9F6" stroke="#D1D5DB" stroke-width="2"/>
+  </g>
+  <rect x="30" y="98" width="260" height="4" fill="#D1D5DB"/>
+  <line x1="35" y1="55" x2="285" y2="55" stroke="#DC2626" stroke-width="2"/>
+  <line x1="35" y1="65" x2="285" y2="65" stroke="#2563EB" stroke-width="2"/>
+  <line x1="35" y1="135" x2="285" y2="135" stroke="#2563EB" stroke-width="2"/>
+  <line x1="35" y1="145" x2="285" y2="145" stroke="#DC2626" stroke-width="2"/>
+  <g fill="#475569">
+    <circle cx="45" cy="55" r="1.2"/><circle cx="60" cy="55" r="1.2"/><circle cx="75" cy="55" r="1.2"/><circle cx="90" cy="55" r="1.2"/><circle cx="105" cy="55" r="1.2"/><circle cx="120" cy="55" r="1.2"/><circle cx="135" cy="55" r="1.2"/><circle cx="150" cy="55" r="1.2"/><circle cx="165" cy="55" r="1.2"/><circle cx="180" cy="55" r="1.2"/><circle cx="195" cy="55" r="1.2"/><circle cx="210" cy="55" r="1.2"/><circle cx="225" cy="55" r="1.2"/><circle cx="240" cy="55" r="1.2"/><circle cx="255" cy="55" r="1.2"/><circle cx="270" cy="55" r="1.2"/>
+    <circle cx="45" cy="65" r="1.2"/><circle cx="60" cy="65" r="1.2"/><circle cx="75" cy="65" r="1.2"/><circle cx="90" cy="65" r="1.2"/><circle cx="105" cy="65" r="1.2"/><circle cx="120" cy="65" r="1.2"/><circle cx="135" cy="65" r="1.2"/><circle cx="150" cy="65" r="1.2"/><circle cx="165" cy="65" r="1.2"/><circle cx="180" cy="65" r="1.2"/><circle cx="195" cy="65" r="1.2"/><circle cx="210" cy="65" r="1.2"/><circle cx="225" cy="65" r="1.2"/><circle cx="240" cy="65" r="1.2"/><circle cx="255" cy="65" r="1.2"/><circle cx="270" cy="65" r="1.2"/>
+    <circle cx="60" cy="75" r="1.2"/><circle cx="60" cy="81" r="1.2"/><circle cx="60" cy="87" r="1.2"/><circle cx="60" cy="93" r="1.2"/>
+    <circle cx="90" cy="75" r="1.2"/><circle cx="90" cy="81" r="1.2"/><circle cx="90" cy="87" r="1.2"/><circle cx="90" cy="93" r="1.2"/>
+    <circle cx="120" cy="75" r="1.2"/><circle cx="120" cy="81" r="1.2"/><circle cx="120" cy="87" r="1.2"/><circle cx="120" cy="93" r="1.2"/>
+    <circle cx="150" cy="75" r="1.2"/><circle cx="150" cy="81" r="1.2"/><circle cx="150" cy="87" r="1.2"/><circle cx="150" cy="93" r="1.2"/>
+    <circle cx="180" cy="75" r="1.2"/><circle cx="180" cy="81" r="1.2"/><circle cx="180" cy="87" r="1.2"/><circle cx="180" cy="93" r="1.2"/>
+    <circle cx="210" cy="75" r="1.2"/><circle cx="210" cy="81" r="1.2"/><circle cx="210" cy="87" r="1.2"/><circle cx="210" cy="93" r="1.2"/>
+    <circle cx="240" cy="75" r="1.2"/><circle cx="240" cy="81" r="1.2"/><circle cx="240" cy="87" r="1.2"/><circle cx="240" cy="93" r="1.2"/>
+    <circle cx="60" cy="107" r="1.2"/><circle cx="60" cy="113" r="1.2"/><circle cx="60" cy="119" r="1.2"/><circle cx="60" cy="125" r="1.2"/>
+    <circle cx="120" cy="107" r="1.2"/><circle cx="120" cy="113" r="1.2"/><circle cx="120" cy="119" r="1.2"/><circle cx="120" cy="125" r="1.2"/>
+    <circle cx="180" cy="107" r="1.2"/><circle cx="180" cy="113" r="1.2"/><circle cx="180" cy="119" r="1.2"/><circle cx="180" cy="125" r="1.2"/>
+    <circle cx="240" cy="107" r="1.2"/><circle cx="240" cy="113" r="1.2"/><circle cx="240" cy="119" r="1.2"/><circle cx="240" cy="125" r="1.2"/>
+  </g>
+  <text x="80" y="37" font-family="sans-serif" font-size="10" fill="#64748B" font-weight="bold">830 TIE-POINT SOLDERLESS BREADBOARD</text>
+</svg>

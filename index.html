@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#101827" />
+  <title>LabSync — Every Asset. In Sync.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="toast" class="toast" role="status"></div>
+  <main id="app">
+    <section class="auth-shell" id="auth-screen">
+      <div class="auth-art">
+        <div class="brand"><span class="brand-mark">L</span><span>LabSync</span></div>
+        <div class="art-copy">
+          <p class="eyebrow">SMART LAB MANAGEMENT</p>
+          <h1>Every asset.<br><em>In sync.</em></h1>
+          <p>One connected space to request, issue, track and return laboratory equipment.</p>
+        </div>
+        <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        <div class="art-foot">EQUIPMENT • PEOPLE • ACCOUNTABILITY</div>
+      </div>
+      <div class="auth-panel">
+        <div class="mobile-brand brand"><span class="brand-mark">L</span><span>LabSync</span></div>
+        <div class="auth-card">
+          <p class="eyebrow" id="auth-eyebrow">WELCOME BACK</p>
+          <h2 id="auth-title">Sign in to LabSync</h2>
+          <p class="muted" id="auth-subtitle">Access your laboratory workspace.</p>
+          <div class="role-tabs">
+            <button class="role-tab active" data-role="student" type="button">Student</button>
+            <button class="role-tab" data-role="admin" type="button">Lab admin</button>
+          </div>
+          <form id="login-form">
+            <label>Email address<input id="login-email" type="email" placeholder="you@college.edu" autocomplete="username" required /></label>
+            <label>Password<input id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password" required /></label>
+            <button class="btn primary full" type="submit">Sign in <span>→</span></button>
+          </form>
+          <div class="auth-links" id="student-auth-links">
+            <button class="link-btn" id="show-register" type="button">Create student account</button>
+            <button class="link-btn" id="forgot-password" type="button">Forgot password?</button>
+          </div>
+          <form id="register-form" class="hidden">
+            <div class="form-grid">
+              <label>Full name<input id="reg-name" required placeholder="Your full name" /></label>
+              <label>Student USN / ID<input id="reg-usn" required placeholder="e.g. 1DS24CS001" /></label>
+            </div>
+            <label>College email<input id="reg-email" type="email" required placeholder="you@college.edu" /></label>
+            <div class="form-grid">
+              <label>Department<select id="reg-dept" required><option value="">Select</option><option>Computer Science</option><option>Information Science</option><option>Electronics</option><option>Mechanical</option><option>Civil</option><option>Other</option></select></label>
+              <label>Semester<select id="reg-sem" required><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+            </div>
+            <div class="form-grid">
+              <label>Create password<input id="reg-password" type="password" minlength="8" required placeholder="At least 8 characters" /></label>
+              <label>Confirm password<input id="reg-confirm-password" type="password" minlength="8" required placeholder="Re-enter password" /></label>
+            </div>
+            <button class="btn primary full" type="submit">Submit registration <span>→</span></button>
+            <button class="link-btn back-login" type="button">Back to sign in</button>
+          </form>
+          <p class="auth-note" id="auth-note">Student accounts require approval from a lab administrator.</p>
+        </div>
+        <div class="auth-bottom">© 2026 LabSync · Laboratory equipment, simplified.</div>
+      </div>
+    </section>
+
+    <section id="workspace" class="workspace hidden">
+      <aside class="sidebar">
+        <div class="brand side-brand"><span class="brand-mark">L</span><span>LabSync</span></div>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav id="nav">
+          <button class="nav-item active" data-page="overview"><span>◫</span> Overview</button>
+          <button class="nav-item" data-page="equipment"><span>▦</span> Equipment</button>
+          <button class="nav-item" data-page="requests"><span>⇄</span> Requests <b id="request-badge" class="nav-badge hidden">0</b></button>
+          <button class="nav-item admin-only" data-page="students"><span>♙</span> Student approvals</button>
+          <button class="nav-item" data-page="myloans"><span>▤</span> My loans</button>
+          <button class="nav-item admin-only" data-page="activity"><span>◷</span> Activity & returns</button>
+          <button class="nav-item admin-only" data-page="settings"><span>⚙</span> Admin settings</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="user-mini" id="user-profile-trigger" title="Click to view profile & change password" role="button" tabindex="0">
+            <div class="avatar" id="user-avatar">U</div>
+            <div>
+              <strong id="user-name">User</strong>
+              <small id="user-role">Student</small>
+            </div>
+            <span class="user-gear" title="Settings">⚙</span>
+          </div>
+          <button class="nav-item signout" id="signout"><span>↪</span> Sign out</button>
+        </div>
+      </aside>
+      <section class="main-area">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="icon-btn mobile-menu-btn" id="menu-toggle" aria-label="Toggle navigation menu">☰</button>
+            <div>
+              <p class="eyebrow" id="page-kicker">LAB MANAGEMENT</p>
+              <h2 id="page-title">Overview</h2>
+            </div>
+          </div>
+          <div class="top-actions">
+            <span class="status-indicator"><span class="status-dot"></span><span class="muted status-text">Live Sync</span></span>
+            <button class="icon-btn theme-toggle-btn" id="theme-toggle" title="Switch Theme (Cyber Dark / Studio Light)" aria-label="Toggle theme">☀️</button>
+            <div class="notif-wrapper">
+              <button class="icon-btn notif-btn" id="notif-btn" title="In-app Notifications" aria-label="Notifications">
+                <span class="bell-icon">🔔</span>
+                <span id="notif-badge" class="notif-badge hidden">0</span>
+              </button>
+              <div id="notif-panel" class="notif-panel hidden" aria-live="polite">
+                <div class="notif-header">
+                  <strong>Notifications</strong>
+                  <button class="link-btn notif-clear-btn" id="notif-mark-read" type="button">Mark all read</button>
+                </div>
+                <div class="notif-list" id="notif-list">
+                  <div class="empty">No new notifications</div>
+                </div>
+              </div>
+            </div>
+            <button class="icon-btn" id="refresh-btn" title="Refresh workspace data">↻</button>
+          </div>
+        </header>
+        <div class="page-content" id="page-content"></div>
+      </section>
+    </section>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

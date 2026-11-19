@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+  <rect width="100%" height="100%" fill="#F4F7F6" rx="12"/>
+  <g filter="drop-shadow(0 4px 8px rgba(0,0,0,0.12))">
+    <rect x="105" y="30" width="110" height="115" rx="7" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  </g>
+  <g fill="#E2E8F0">
+    <rect x="118" y="42" width="84" height="4" rx="1"/><rect x="118" y="50" width="84" height="4" rx="1"/><rect x="118" y="58" width="84" height="4" rx="1"/><rect x="118" y="66" width="84" height="4" rx="1"/><rect x="118" y="74" width="84" height="4" rx="1"/><rect x="118" y="82" width="84" height="4" rx="1"/><rect x="118" y="90" width="84" height="4" rx="1"/><rect x="118" y="98" width="84" height="4" rx="1"/>
+  </g>
+  <text x="132" y="122" font-family="sans-serif" font-size="12" fill="#334155" font-weight="bold">DHT22</text>
+  <text x="136" y="135" font-family="monospace" font-size="8" fill="#64748B">AM2302</text>
+  <g fill="#D4AF37" stroke="#996515" stroke-width="0.5">
+    <rect x="124" y="145" width="5" height="35" rx="1"/>
+    <rect x="144" y="145" width="5" height="35" rx="1"/>
+    <rect x="164" y="145" width="5" height="35" rx="1"/>
+    <rect x="184" y="145" width="5" height="35" rx="1"/>
+  </g>
+  <text x="121" y="190" font-family="monospace" font-size="7.5" fill="#666">VCC</text>
+  <text x="141" y="190" font-family="monospace" font-size="7.5" fill="#666">DAT</text>
+  <text x="163" y="190" font-family="monospace" font-size="7.5" fill="#666">NC</text>
+  <text x="181" y="190" font-family="monospace" font-size="7.5" fill="#666">GND</text>
+</svg>

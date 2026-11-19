@@ -1,0 +1,24 @@
+{
+  "name": "labsync",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "bootstrap:admins": "node scripts/bootstrap-admins.mjs",
+    "bootstrap:demo": "node scripts/bootstrap-demo.mjs",
+    "test:audit": "node scripts/audit-supabase.mjs",
+    "test:automation": "node scripts/test-admin-settings-automation.mjs",
+    "test:gemini": "node scripts/test-gemini-live.mjs",
+    "test": "node scripts/audit-supabase.mjs && node scripts/test-admin-settings-automation.mjs && node scripts/test-gemini-live.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0",
+    "dotenv": "^16.4.7",
+    "html5-qrcode": "^2.3.8",
+    "qrcode": "^1.5.4",
+    "vite": "^6.3.5"
+  }
+}
