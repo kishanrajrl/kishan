@@ -6,16 +6,10 @@ This is a Vite + vanilla JavaScript website with Supabase Auth and a Supabase Po
 
 1. Create a project at https://supabase.com.
 2. Open **SQL Editor → New query**.
-<<<<<<< HEAD
 3. Paste and run all of `supabase/schema.sql` (creates base tables, auth triggers, RPCs, and RLS policies).
 4. Open **SQL Editor -> New query**, paste and run all of `supabase/migrations/20261118_admin_settings_and_automation.sql` (creates admin_settings, notifications, automation procedures, and default configuration).
 5. Open **Project Settings -> API** and copy the Project URL, `anon` public key, and `service_role` secret key.
 6. In **Authentication -> URL Configuration**, set the Site URL to your eventual Vercel URL. Add `http://localhost:5173/**` and your Vercel URL to Redirect URLs.
-=======
-3. Paste and run all of `supabase/schema.sql`.
-4. Open **Project Settings → API** and copy the Project URL and `anon` / publishable key.
-5. In **Authentication → URL Configuration**, set the Site URL to your eventual Vercel URL. Add `http://localhost:5173/**` and your Vercel URL to Redirect URLs.
->>>>>>> e6f9b47d11456ab0d506dcc8dcd825b49d8b8230
 
 ## 2. Configure local environment
 
@@ -105,11 +99,7 @@ The website includes a floating **Ask LabBuddy** chat assistant. The Gemini API 
 1. Open your existing `.env.local` file and add these lines:
    ```env
    GEMINI_API_KEY=your_actual_gemini_api_key
-<<<<<<< HEAD
    GEMINI_MODEL=gemini-flash-lite-latest
-=======
-   GEMINI_MODEL=gemini-3.5-flash-lite
->>>>>>> e6f9b47d11456ab0d506dcc8dcd825b49d8b8230
    ```
 2. Save `.env.local`.
 3. Stop and restart the Vite server with `npm.cmd run dev`.
@@ -120,11 +110,7 @@ The website includes a floating **Ask LabBuddy** chat assistant. The Gemini API 
 2. Add `VITE_SUPABASE_URL` (Public)
 3. Add `VITE_SUPABASE_ANON_KEY` (Public)
 4. Add `GEMINI_API_KEY` (Server-side only — DO NOT prefix with VITE_)
-<<<<<<< HEAD
 5. Add `GEMINI_MODEL` with value `gemini-flash-lite-latest` (Server-side only)
-=======
-5. Add `GEMINI_MODEL` with value `gemini-3.5-flash-lite` (Server-side only)
->>>>>>> e6f9b47d11456ab0d506dcc8dcd825b49d8b8230
 6. Add `SUPABASE_SERVICE_ROLE_KEY` (Server-side only — used by `/api/automation` cron to auto-expire uncollected bookings and restore inventory)
 7. Select Production and Preview, save, then deploy.
 
