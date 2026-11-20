@@ -10,6 +10,11 @@ export default async function handler(req, res) {
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch {}
   }
-  const result = await handleGeminiChat(body);
-  return res.status(result.status).json(result.body);
+  try {
+    const result = await handleGeminiChat(body);
+    return res.status(result.status).json(result.body);
+  } catch (err) {
+    console.error('Unhandled chat handler error:', err);
+    return res.status(500).json({ error: 'Internal server error while processing AI request.' });
+  }
 }

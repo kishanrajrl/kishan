@@ -2953,16 +2953,23 @@ function initChatbot() {
 
   const sendMessage = async (raw) => {
     const text = raw.trim();
-    if (!text || send.disabled) return;
+    if (!text || send.disabled || input.disabled) return;
 
     root.querySelector('#buddy-suggestions')?.classList.add('hidden');
     renderBubble(text, 'user');
     history.push({ role: 'user', text });
+
+    const originalPlaceholder = input.placeholder;
     input.value = '';
+    input.disabled = true;
+    input.placeholder = 'LabBuddy is thinking...';
     send.disabled = true;
     send.textContent = '…';
 
     const pending = renderBubble('LabBuddy is analysing...', 'assistant typing');
+
+    const controller = new AbortController();
+    const clientTimeoutId = setTimeout(() => controller.abort(), 25000);
 
     try {
       const response = await fetch('/api/chat', {
@@ -2978,12 +2985,13 @@ function initChatbot() {
             total_quantity: item.total_quantity,
             available_quantity: item.available_quantity
           }))
-        })
+        }),
+        signal: controller.signal
       });
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || 'The AI assistant is temporarily unavailable.');
+        throw new Error(data.error || `Server responded with status ${response.status}. Please try again.`);
       }
 
       pending.remove();
@@ -2991,9 +2999,18 @@ function initChatbot() {
       history.push({ role: 'model', text: data.reply });
       if (history.length > 12) history.splice(0, history.length - 12);
     } catch (error) {
-      pending.textContent = error.message || 'Unable to contact LabBuddy. Please try again.';
+      let errorMessage = error.message || 'Unable to contact LabBuddy. Please try again.';
+      if (error.name === 'AbortError') {
+        errorMessage = 'LabBuddy request timed out. Please check your connection and try asking again.';
+      } else if (errorMessage.toLowerCase().includes('failed to fetch')) {
+        errorMessage = 'Network connection issue: Unable to reach LabBuddy. Please verify your connection.';
+      }
+      pending.textContent = errorMessage;
       pending.className = 'buddy-message assistant error';
     } finally {
+      clearTimeout(clientTimeoutId);
+      input.disabled = false;
+      input.placeholder = originalPlaceholder;
       send.disabled = false;
       send.textContent = '➤';
       input.focus();
@@ -3018,6 +3035,9 @@ function initChatbot() {
     `;
     root.querySelector('#buddy-suggestions')?.classList.remove('hidden');
     input.value = '';
+    input.disabled = false;
+    send.disabled = false;
+    send.textContent = '➤';
     input.focus();
     toast('LabBuddy conversation reset.');
   };

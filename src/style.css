@@ -1830,6 +1830,7 @@ tr:hover td { background: rgba(14, 165, 233, 0.05); }
 }
 .buddy-composer button:hover:not(:disabled) { transform: scale(1.08); }
 .buddy-composer button:disabled { opacity: 0.55; cursor: wait; }
+.buddy-composer input:disabled { opacity: 0.65; cursor: wait; }
 
 .buddy-footnote {
   text-align: center;

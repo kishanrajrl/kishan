@@ -1,17 +1,42 @@
-const DEFAULT_MODEL = 'gemini-flash-lite-latest';
-const FALLBACK_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
+const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
+const FAST_FALLBACK_MODELS = [
+  'gemini-3-flash-preview',
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash'
+];
+const KNOWN_SLOW_OR_DEPRECATED = new Set([
+  'gemini-3.8-flash',
+  'gemini-flash-latest',
+  'gemini-3.1-flash-lite',
+  'gemini-3.6-flash',
+  'gemini-3.7-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-exp',
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+  'gemini-2.5-flash-lite'
+]);
 
-async function fetchFromGemini(modelName, apiKey, systemInstruction, messages) {
+async function fetchFromGemini(modelName, apiKey, systemInstruction, messages, timeoutMs = 8000) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent`;
-  return await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: systemInstruction }] },
-      contents: messages,
-      generationConfig: { temperature: 0.55, maxOutputTokens: 800 }
-    })
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents: messages,
+        generationConfig: { temperature: 0.55, maxOutputTokens: 800 }
+      }),
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function handleGeminiChat(body, env = process.env) {
@@ -68,12 +93,28 @@ Never claim you have modified a booking or issued equipment yourself — guide t
 
 ${inventoryContext}`;
 
-  let modelsToTry = [env.GEMINI_MODEL || DEFAULT_MODEL, ...FALLBACK_MODELS.filter(m => m !== (env.GEMINI_MODEL || DEFAULT_MODEL))];
+  const envModel = (env.GEMINI_MODEL || '').trim();
+  const candidateModels = [];
+
+  // If a valid custom model that is NOT known to be overloaded/deprecated is configured, prioritize it
+  if (envModel && !KNOWN_SLOW_OR_DEPRECATED.has(envModel)) {
+    candidateModels.push(envModel);
+  }
+
+  // Always prioritize fast, responsive flash-lite models
+  candidateModels.push(DEFAULT_MODEL, ...FAST_FALLBACK_MODELS);
+
+  // If the user configured a known slow or overloaded model, keep it as last resort
+  if (envModel && KNOWN_SLOW_OR_DEPRECATED.has(envModel)) {
+    candidateModels.push(envModel);
+  }
+
+  const modelsToTry = [...new Set(candidateModels)];
   let response;
   let responseData = null;
   for (const modelToTry of modelsToTry) {
     try {
-      const res = await fetchFromGemini(modelToTry, apiKey, systemInstruction, messages);
+      const res = await fetchFromGemini(modelToTry, apiKey, systemInstruction, messages, 8000);
       const data = await res.json().catch(() => ({}));
       response = res;
       responseData = data;
@@ -82,7 +123,7 @@ ${inventoryContext}`;
         break;
       }
     } catch {
-      // Continue to next candidate
+      // Timeout or network error: continue to next candidate model
     }
   }
 
