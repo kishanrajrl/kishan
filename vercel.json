@@ -1,4 +1,13 @@
 {
+<<<<<<< HEAD
+=======
+  "crons": [
+    {
+      "path": "/api/automation",
+      "schedule": "*/15 * * * *"
+    }
+  ],
+>>>>>>> e6f9b47d11456ab0d506dcc8dcd825b49d8b8230
   "rewrites": [
     {
       "source": "/((?!api/).*)",
