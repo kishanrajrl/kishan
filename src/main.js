@@ -989,7 +989,9 @@ function renderRequests(c) {
               </tr>
             </thead>
             <tbody>
-              ${items.map(r => `<tr>
+              ${items.map(r => {
+                const linkedLoan = cache.loans.find(l => l.request_id === r.id);
+                return `<tr>
                 <td><b>${esc(r.equipment?.name || 'Equipment')}</b><br><small class="code-tag">${esc(r.equipment?.asset_code || '')}</small></td>
                 ${isAdmin() ? `<td>
                   <b>${esc(r.profiles?.full_name || 'Student')}</b><br>
@@ -998,24 +1000,37 @@ function renderRequests(c) {
                 <td><small>${esc(r.purpose || 'No purpose stated')}</small></td>
                 <td>${formatDate(r.requested_return_date)}</td>
                 <td>${formatDate(r.created_at)}</td>
-                <td>${statusPill(r.status)}</td>
+                <td>${(() => {
+                  if (r.status === 'pending') return '<span class="pill orange">Pending Approval</span>';
+                  if (r.status === 'approved') {
+                    if (!linkedLoan) return '<span class="pill orange" style="font-weight:600;">Approved (Awaiting Collection)</span>';
+                    return '<span class="pill green" style="font-weight:600;">Issued / Collected</span>';
+                  }
+                  if (r.status === 'rejected') return '<span class="pill red">Rejected</span>';
+                  if (r.status === 'cancelled') return '<span class="pill gray">Cancelled</span>';
+                  return statusPill(r.status);
+                })()}</td>
                 <td>
                   ${isAdmin() ? (r.status === 'pending' ? `
                     <div class="inline-actions">
-                      <button class="btn primary small-btn" data-approve="${r.id}">Approve & Issue</button>
+                      <button class="btn primary small-btn" data-approve="${r.id}">Approve</button>
                       <button class="btn danger small-btn" data-reject="${r.id}">Reject</button>
                     </div>
-                  ` : r.status === 'approved' ? `
-                    <button class="btn danger small-btn" data-cancel="${r.id}" title="Revoke uncollected booking and restore stock">Revoke Booking</button>
-                  ` : '<span class="muted">—</span>') : (
+                  ` : r.status === 'approved' ? (!linkedLoan ? `
+                    <div class="inline-actions">
+                      <button class="btn success small-btn" data-issue="${r.id}" style="background:#10b981;border-color:#10b981;font-weight:600;">⚡ Issue Hardware</button>
+                      <button class="btn danger small-btn" data-cancel="${r.id}" title="Revoke booking and restore stock">Revoke</button>
+                    </div>
+                  ` : `<span class="badge badge-issued" style="display:inline-block;padding:3px 8px;font-size:11px;">✓ ISSUED (#${esc(linkedLoan.id.slice(0, 8))})</span>`) : '<span class="muted">—</span>') : (
                     r.status === 'pending' && adminSettings.allowStudentCancelPending ? `
                       <button class="btn danger small-btn" data-cancel="${r.id}">Cancel Request</button>
-                    ` : r.status === 'approved' && adminSettings.allowStudentCancelApproved ? `
+                    ` : r.status === 'approved' && !linkedLoan && adminSettings.allowStudentCancelApproved ? `
                       <button class="btn danger small-btn" data-cancel="${r.id}">Cancel Booking</button>
                     ` : '<span class="muted">—</span>'
                   )}
                 </td>
-              </tr>`).join('')}
+              </tr>`;
+              }).join('')}
             </tbody>
           </table>
         </div>
@@ -1026,8 +1041,9 @@ function renderRequests(c) {
     </div>
   `;
 
-  c.querySelectorAll('[data-approve]').forEach(b => b.onclick = () => updateRequest(b.dataset.approve, 'approved'));
-  c.querySelectorAll('[data-reject]').forEach(b => b.onclick = () => updateRequest(b.dataset.reject, 'rejected'));
+  c.querySelectorAll('[data-approve]').forEach(b => b.onclick = () => approveBookingRequest(b.dataset.approve));
+  c.querySelectorAll('[data-issue]').forEach(b => b.onclick = () => issueBookingHardware(b.dataset.issue));
+  c.querySelectorAll('[data-reject]').forEach(b => b.onclick = () => rejectBookingRequest(b.dataset.reject));
   c.querySelectorAll('[data-cancel]').forEach(b => b.onclick = () => cancelBookingRequest(b.dataset.cancel));
 }
 
@@ -2062,45 +2078,94 @@ async function cancelBookingRequest(requestId) {
   toast('Requisition cancelled successfully.');
 }
 
-async function updateRequest(id, status) {
+async function approveBookingRequest(id) {
   const r = cache.requests.find(x => x.id === id);
   if (!r) return;
 
-  if (status === 'approved') {
-    const defaultDays = Number(adminSettings.defaultLoanDurationDays) || 7;
-    const calcDue = new Date(Date.now() + defaultDays * 86400000).toISOString().slice(0, 10);
-    const defaultDue = r.requested_return_date || calcDue;
-    const body = `
-      <p class="muted">Approve booking and assign <b>${esc(r.equipment?.name || 'Equipment')}</b> to student <b>${esc(r.profiles?.full_name || 'Student')}</b> (USN: <code>${esc(r.profiles?.usn || '—')}</code>)?</p>
-      <label>Approved Equipment Return Due Date
-        <input id="approve-due" type="date" min="${new Date().toISOString().slice(0, 10)}" value="${defaultDue}" required />
-      </label>
-      <div class="notice" style="margin-top:12px;font-size:11px;">
-        Approving this request will atomically decrement available inventory by 1 unit and generate an active loan record.
-      </div>
-    `;
+  const body = `
+    <p class="muted">Confirm approval of requisition for <b>${esc(r.equipment?.name || 'Equipment')}</b> requested by <b>${esc(r.profiles?.full_name || 'Student')}</b> (USN: <code>${esc(r.profiles?.usn || '—')}</code>)?</p>
+    <div class="notice" style="margin-top:12px;font-size:12px;line-height:1.5;">
+      <b>📦 Step 1 — Stock Reservation:</b> Approving this requisition reserves 1 unit in laboratory inventory so it cannot be claimed by other students.
+      <br><br>
+      <b>⚡ Step 2 — Physical Handover:</b> When the student physically visits the laboratory counter to collect the equipment, click <b>"⚡ Issue Hardware"</b> to record the official handover and set the return due date.
+    </div>
+  `;
 
-    modal('Approve Booking & Issue Hardware', body, 'Approve & Issue Hardware', async w => {
-      const due = w.querySelector('#approve-due').value;
-      if (!due) throw new Error('Please select a valid return due date.');
-
-      const { error } = await supabase.rpc('approve_booking', {
-        p_request_id: id,
-        p_due_at: due
-      });
-      if (error) throw error;
-
-      await logActivity(`Approved requisition & issued ${r.equipment?.name || 'equipment'} to ${r.profiles?.full_name || 'student'}`);
-      await reload();
-      toast('Approved! Equipment successfully issued and stock updated.');
+  modal('Approve Requisition (Step 1)', body, 'Approve Requisition', async () => {
+    const res = await fetch('/api/automation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'approve_request', requestId: id, actor: profile?.full_name || profile?.email || 'Admin' })
     });
-  } else {
-    if (!confirm(`Reject equipment requisition for "${r.equipment?.name || 'equipment'}"?`)) return;
-    const { error } = await supabase.from('booking_requests').update({ status: 'rejected' }).eq('id', id);
-    if (error) throw error;
-    await logActivity(`Rejected booking requisition for ${r.equipment?.name || 'equipment'}`);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Failed to approve requisition.');
+
     await reload();
-    toast('Requisition rejected.');
+    toast('Requisition approved! 1 unit reserved. Ready for student collection at the counter.');
+  });
+}
+
+async function issueBookingHardware(id) {
+  const r = cache.requests.find(x => x.id === id);
+  if (!r) return;
+
+  const defaultDays = Number(adminSettings.defaultLoanDurationDays) || 7;
+  const calcDue = new Date(Date.now() + defaultDays * 86400000).toISOString().slice(0, 10);
+  const defaultDue = r.requested_return_date || calcDue;
+
+  const body = `
+    <div style="margin-bottom:12px;">
+      <span class="pill green" style="margin-bottom:8px;display:inline-block;font-size:11px;">✓ Requisition Approved</span>
+      <h4 style="margin:4px 0 8px;">Physical Handover & Equipment Issue (Step 2)</h4>
+      <p class="muted" style="margin:0 0 12px;font-size:13px;">
+        Handing over <b>${esc(r.equipment?.name || 'Equipment')}</b> (<code class="code-tag">${esc(r.equipment?.asset_code || '')}</code>) to student <b>${esc(r.profiles?.full_name || 'Student')}</b> (USN: <code>${esc(r.profiles?.usn || '—')}</code>, Dept: <code>${esc(r.profiles?.department || '—')}</code>).
+      </p>
+    </div>
+    <label>Agreed Return Due Date
+      <input id="issue-due-date" type="date" min="${new Date().toISOString().slice(0, 10)}" value="${defaultDue}" required />
+    </label>
+    <div class="notice" style="margin-top:12px;font-size:11px;line-height:1.4;">
+      This action officially issues the physical asset to the student and activates loan tracking, return inspection, and overdue monitoring.
+    </div>
+  `;
+
+  modal('Issue Equipment (Physical Handover)', body, 'Confirm Handover & Issue Hardware', async w => {
+    const due = w.querySelector('#issue-due-date').value;
+    if (!due) throw new Error('Please select a valid return due date.');
+
+    const res = await fetch('/api/automation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'issue_equipment', requestId: id, dueAt: due, actor: profile?.full_name || profile?.email || 'Admin' })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Failed to issue equipment.');
+
+    await reload();
+    toast('Equipment successfully issued! Active loan recorded in the system.');
+  });
+}
+
+async function rejectBookingRequest(id) {
+  const r = cache.requests.find(x => x.id === id);
+  if (!r) return;
+  if (!confirm(`Reject equipment requisition for "${r.equipment?.name || 'equipment'}"?`)) return;
+
+  const { error } = await supabase.from('booking_requests').update({ status: 'rejected' }).eq('id', id);
+  if (error) {
+    toast(error.message, true);
+    return;
+  }
+  await logActivity(`Rejected booking requisition for ${r.equipment?.name || 'equipment'}`);
+  await reload();
+  toast('Requisition rejected.');
+}
+
+async function updateRequest(id, status) {
+  if (status === 'approved') {
+    return approveBookingRequest(id);
+  } else {
+    return rejectBookingRequest(id);
   }
 }
 

@@ -308,6 +308,111 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, settings: reset });
     }
 
+    if (action === 'approve_request') {
+      const { requestId, actor } = body;
+      if (!requestId) return res.status(400).json({ error: 'Missing requestId' });
+
+      const { data: req, error: rErr } = await supabase
+        .from('booking_requests')
+        .select('*, equipment(*), profiles(*)')
+        .eq('id', requestId)
+        .maybeSingle();
+
+      if (rErr || !req) return res.status(404).json({ error: 'Booking request not found' });
+      if (req.status !== 'pending') return res.status(400).json({ error: `Request is already ${req.status}` });
+
+      const currentAvail = Number(req.equipment?.available_quantity) || 0;
+      if (currentAvail < 1) {
+        return res.status(400).json({ error: 'No available units in inventory to reserve.' });
+      }
+
+      // 1. Atomically reserve inventory
+      const { error: eqErr } = await supabase
+        .from('equipment')
+        .update({ available_quantity: Math.max(0, currentAvail - 1) })
+        .eq('id', req.equipment_id);
+      if (eqErr) return res.status(500).json({ error: eqErr.message });
+
+      // 2. Set request status to 'approved'
+      const { error: updErr } = await supabase
+        .from('booking_requests')
+        .update({ status: 'approved' })
+        .eq('id', requestId);
+      if (updErr) return res.status(500).json({ error: updErr.message });
+
+      // 3. Activity audit log
+      await supabase.from('activity_log').insert({
+        description: `REQUISITION APPROVED: Booking #${requestId.slice(0, 8)} for ${req.equipment?.name || 'Equipment'} (${req.equipment?.asset_code || ''}) by ${req.profiles?.full_name || 'Student'} approved by ${actor || 'Admin'}. 1 unit reserved in stock, awaiting collection at counter.`
+      });
+
+      // 4. In-app notification for the student
+      try {
+        await supabase.from('notifications').insert({
+          user_id: req.user_id,
+          title: 'Booking Approved — Ready for Collection',
+          message: `Your booking for ${req.equipment?.name || 'equipment'} has been approved! Please visit the laboratory counter to collect your hardware.`,
+          type: 'success'
+        });
+      } catch {}
+
+      return res.status(200).json({ success: true, message: 'Requisition approved. Stock reserved for student collection.' });
+    }
+
+    if (action === 'issue_equipment') {
+      const { requestId, dueAt, actor } = body;
+      if (!requestId) return res.status(400).json({ error: 'Missing requestId' });
+      if (!dueAt) return res.status(400).json({ error: 'Please specify a return due date' });
+
+      const { data: req, error: rErr } = await supabase
+        .from('booking_requests')
+        .select('*, equipment(*), profiles(*)')
+        .eq('id', requestId)
+        .maybeSingle();
+
+      if (rErr || !req) return res.status(404).json({ error: 'Booking request not found' });
+      if (req.status !== 'approved') return res.status(400).json({ error: 'Request must be approved before issuing hardware' });
+
+      const { data: existingLoan } = await supabase
+        .from('loans')
+        .select('id')
+        .eq('request_id', requestId)
+        .maybeSingle();
+      if (existingLoan) {
+        return res.status(400).json({ error: 'Equipment has already been issued for this booking.' });
+      }
+
+      const dueTimestamp = new Date(dueAt + 'T23:59:59Z').toISOString();
+      const { data: loan, error: lErr } = await supabase
+        .from('loans')
+        .insert({
+          user_id: req.user_id,
+          equipment_id: req.equipment_id,
+          request_id: req.id,
+          due_at: dueTimestamp,
+          status: 'issued',
+          issued_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (lErr) return res.status(500).json({ error: lErr.message });
+
+      await supabase.from('activity_log').insert({
+        description: `HARDWARE ISSUED: Handed over ${req.equipment?.name || 'Equipment'} (${req.equipment?.asset_code || ''}) to ${req.profiles?.full_name || 'Student'} by ${actor || 'Admin'}. Return due by ${dueAt}.`
+      });
+
+      try {
+        await supabase.from('notifications').insert({
+          user_id: req.user_id,
+          title: 'Equipment Issued',
+          message: `You have collected ${req.equipment?.name || 'hardware'}. Return due date is ${dueAt}.`,
+          type: 'info'
+        });
+      } catch {}
+
+      return res.status(200).json({ success: true, loan, message: 'Equipment successfully issued to student.' });
+    }
+
     // Default action: Run automation process
     const result = await processAutomatedCancellations(supabase, body.actor || 'Manual Admin Trigger');
     return res.status(result.success ? 200 : 500).json(result);
